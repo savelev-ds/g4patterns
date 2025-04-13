@@ -1,4 +1,8 @@
-package ru.redactor.patterns.grand.factorymethod;
+package ru.redactor.patterns.grand.factorymethod.abc;
+
+import ru.redactor.patterns.grand.factorymethod.JournalRecordFactoryIF;
+import ru.redactor.patterns.grand.factorymethod.JournalRecordIF;
+import ru.redactor.patterns.grand.factorymethod.StartOfSale;
 
 import java.io.DataInput;
 import java.io.IOException;

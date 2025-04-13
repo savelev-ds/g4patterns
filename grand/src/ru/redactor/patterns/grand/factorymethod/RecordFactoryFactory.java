@@ -1,5 +1,8 @@
 package ru.redactor.patterns.grand.factorymethod;
 
+import ru.redactor.patterns.grand.factorymethod.abc.ABCJournalFactory;
+import ru.redactor.patterns.grand.factorymethod.xyz.XYZJournalFactory;
+
 import java.io.DataInput;
 import java.lang.reflect.Constructor;
 
