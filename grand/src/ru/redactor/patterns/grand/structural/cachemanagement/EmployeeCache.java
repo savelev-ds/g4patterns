@@ -2,8 +2,6 @@ package ru.redactor.patterns.grand.structural.cachemanagement;
 
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 
 import static ru.redactor.patterns.grand.structural.cachemanagement.EmployeeProfile.EmployeeID;
 
@@ -14,19 +12,19 @@ public class EmployeeCache {
      * связный список. Сам по себе кэш реализуется при помощи объекта Hashtable. Значения Hashtable
      * представляют собой объекты связного списка, которые ссылаются на реальный объект EmployeeProfile
      */
-    private HashMap cache = new HashMap();
+    private HashMap<EmployeeID, LinkedList> cache = new HashMap<>();
 
     /**
      * Это головной узел связного списка, который ссылается на наиболее использовавшийся в последнее
      * время объект EmployeeProfile
      */
-    LinkedList mru = null;
+    LinkedList mostRecentUsed = null;
 
     /**
      * Это последний узел связного списка, который ссылается на наименее использовавшийся за последнее
      * время объект EmployeeProfile.
      */
-    LinkedList lru = null;
+    LinkedList leastRecentUsed = null;
 
     /**
      * Максимальное количество объектов EmployeeProfile, которое может находиться в кэше.
@@ -56,27 +54,27 @@ public class EmployeeCache {
             // делая его наиболее используемым за последнее время.
             if (currentCacheSize == 0) {
                 // рассматриваем пустой кэш, как особый случай.
-                lru = mru = new LinkedList(emp);
+                leastRecentUsed = mostRecentUsed = new LinkedList(emp);
             } else {
                 LinkedList newLink;
                 if (currentCacheSize >= MAX_CACHE_SIZE) {
                     // Удаляем наименее использовавщшийся за последнее время объект EmployeeProfile из кэша
-                    newLink = lru;
-                    lru = newLink.previous;
+                    newLink = leastRecentUsed;
+                    leastRecentUsed = newLink.previous;
                     cache.remove(id);
                     currentCacheSize--;
-                    lru.next = null;
+                    leastRecentUsed.next = null;
                     newLink.setProfile(emp);
                 } else {
                     newLink = new LinkedList(emp);
                 }
-                newLink.next = mru;
-                mru.previous = newLink;
+                newLink.next = mostRecentUsed;
+                mostRecentUsed.previous = newLink;
                 newLink.previous = null;
-                mru = newLink;
+                mostRecentUsed = newLink;
             }
             //  Помещаем профиль служащего, наиболее часто использовавшийся в последнее время, в кэш
-            cache.put(id, mru);
+            cache.put(id, mostRecentUsed);
             currentCacheSize++;
         } else { // Профиль уже в кэше
             // Метод addEmployee не должен вызываться, если объект
@@ -95,14 +93,14 @@ public class EmployeeCache {
         // мусора
         myCleanup.cleanup();
 
-        LinkedList foundLink = (LinkedList) cache.get(id);
+        LinkedList foundLink = cache.get(id);
         if (foundLink == null) {
             return null;
         }
-        if (mru != foundLink) {
-            if (foundLink == lru) {
-                lru = foundLink.previous;
-                lru.next = null;
+        if (mostRecentUsed != foundLink) {
+            if (foundLink == leastRecentUsed) {
+                leastRecentUsed = foundLink.previous;
+                leastRecentUsed.next = null;
             }
             if (foundLink.previous != null) {
                 foundLink.previous.next = foundLink.next;
@@ -110,10 +108,10 @@ public class EmployeeCache {
             if (foundLink.next != null) {
                 foundLink.next.previous = foundLink.previous;
             }
-            mru.previous = foundLink;
+            mostRecentUsed.previous = foundLink;
             foundLink.previous = null;
-            foundLink.next = mru;
-            mru = foundLink;
+            foundLink.next = mostRecentUsed;
+            mostRecentUsed = foundLink;
         }
         return foundLink.getProfile();
     }
@@ -122,13 +120,13 @@ public class EmployeeCache {
      * Удаляет объект EmployeeProfile, связанный с данным EmployeeID, находящимся в кэше
      */
     void removeEmployee(EmployeeID id) {
-        LinkedList foundLink = (LinkedList) cache.get(id);
+        LinkedList foundLink = cache.get(id);
         if (foundLink != null) {
-            if (mru == foundLink) {
-                mru = foundLink.next;
+            if (mostRecentUsed == foundLink) {
+                mostRecentUsed = foundLink.next;
             }
-            if (foundLink == lru) {
-                lru = foundLink.previous;
+            if (foundLink == leastRecentUsed) {
+                leastRecentUsed = foundLink.previous;
             }
             if (foundLink.previous != null) {
                 foundLink.previous.next = foundLink.next;
