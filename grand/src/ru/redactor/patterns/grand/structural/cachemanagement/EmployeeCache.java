@@ -60,7 +60,7 @@ public class EmployeeCache {
                 if (currentCacheSize >= MAX_CACHE_SIZE) {
                     // Удаляем наименее использовавщшийся за последнее время объект EmployeeProfile из кэша
                     newLink = leastRecentUsed;
-                    leastRecentUsed = newLink.previous;
+                    leastRecentUsed = leastRecentUsed.previous;
                     cache.remove(id);
                     currentCacheSize--;
                     leastRecentUsed.next = null;
