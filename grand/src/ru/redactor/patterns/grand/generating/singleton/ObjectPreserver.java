@@ -31,7 +31,7 @@ public class ObjectPreserver implements Runnable {
     }
 
     public static void unpreserveObject(Object o) {
-        protectedSet.add(o);
+        protectedSet.remove(o);
     }
 
 }
