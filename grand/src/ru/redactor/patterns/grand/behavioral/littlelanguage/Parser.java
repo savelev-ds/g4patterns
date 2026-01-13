@@ -104,5 +104,12 @@ public class Parser {
         return tName;
     }
 
+    static class SyntaxException extends RuntimeException {
+
+        public SyntaxException(String s) {
+
+        }
+    }
+
 
 }
